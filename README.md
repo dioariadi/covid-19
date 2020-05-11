@@ -1,28 +1,19 @@
 Hasil dibawah juga dapat dilihat pada situs 
 www.datawizart.com/
-### Bagaimana kondisi wilayah provinsi kalian? Apakah telah melewati puncak dari penambahan kasus?
 
-Untuk menjawab ini kami menggunakan rolling avg kasus positif 7 hari
-kebelakang. Hal ini mereplikasi apa yang dilakukan oleh dashboard pada
-Financial Times
-[link](https://ig.ft.com/coronavirus-chart/?areas=usa&areas=idn&cumulative=0&logScale=1&perMillion=0&values=cases).
-Terdapat dua chart yang kami buat, pertama adalah untuk mempermudah
-membandingkan tiap provinsi. Kedua adalah untuk melihat bagaimana
-provinsi itu sendiri.
+Yang diperlukan untuk mereplikasi hasil dibawah:
+covid_19.Rmd
+download data
+ - https://github.com/dioariadi/covid-19/blob/master/df_indo.rds
+ - https://github.com/dioariadi/covid-19/blob/master/df_worldmeter_analysis.rds
+ 
+ #### Reference Chart Style/Type
 
-Selain itu Heatmap didapat dari twitter @VictimOfMaths
-[source](https://github.com/VictimOfMaths/COVID-19). Untuk dapat melihat
-secara lebih untuk membandingkan tiap provinsi
-
-Ketiga grafik ini melengkapi satu sama lain, terdapat keunggulan dan
-kelemahan dalam tiap grafik. Dengan menampilkan ketiganya diharapkan
-dapat diambil analisa atau kesimpulan yang mencukupi.
+-   <a href="https://ig.ft.com/coronavirus-chart/?areas=usa&amp;areas=idn&amp;cumulative=1&amp;logScale=1&amp;perMillion=0&amp;values=cases" class="uri">https://ig.ft.com/coronavirus-chart/?areas=usa&amp;areas=idn&amp;cumulative=1&amp;logScale=1&amp;perMillion=0&amp;values=cases</a>
+-   <a href="https://github.com/VictimOfMaths/COVID-19/blob/master/LAHeatmaps.R" class="uri">https://github.com/VictimOfMaths/COVID-19/blob/master/LAHeatmaps.R</a>
+-   <a href="https://mobile.twitter.com/jburnmurdoch/status/1256711433829703683" class="uri">https://mobile.twitter.com/jburnmurdoch/status/1256711433829703683</a>
 
 #### Time-series Rolling Average Kasus Positif Baru
-
-NOTE: Dalam grafik ini kami telah menyaring provinsi dimana dalam 7 hari
-rolling average kasus positif telah melampui 4. Diurutkan berdasarkan
-provinsi dengan kasus tertinggi.
 
 ``` r
 heatmap_daily_indo %>% group_by(province) %>% 
@@ -52,11 +43,6 @@ heatmap_daily_indo %>% group_by(province) %>%
 <img src="md_covid_19_files/figure-markdown_github/rolling avg kasus positif-1.png" width="672" style="display: block; margin: auto;" />
 
 #### Time-series Kasus Positif Harian dan Rolling Average 7 Hari
-
-Pada grafik ini bar-chart adalah kasus positif harian dan line-chart
-adalah rolling avg 7 hari. Diurutkan berdasarkan kasus positif terbesar.
-Y-axis adalah urutan dari hari pertama terjadinya kasus positif di
-pronvisi tersebut.
 
 ``` r
 heatmap_indo %>% filter(total_case>0 & province!="no_define") %>% 
@@ -244,8 +230,3 @@ Internasional:
 
 [worldmeters](https://www.worldometers.info/coronavirus/#countries)
 
-#### Chart Style/Type
-
--   <a href="https://ig.ft.com/coronavirus-chart/?areas=usa&amp;areas=idn&amp;cumulative=1&amp;logScale=1&amp;perMillion=0&amp;values=cases" class="uri">https://ig.ft.com/coronavirus-chart/?areas=usa&amp;areas=idn&amp;cumulative=1&amp;logScale=1&amp;perMillion=0&amp;values=cases</a>
--   <a href="https://github.com/VictimOfMaths/COVID-19/blob/master/LAHeatmaps.R" class="uri">https://github.com/VictimOfMaths/COVID-19/blob/master/LAHeatmaps.R</a>
--   <a href="https://mobile.twitter.com/jburnmurdoch/status/1256711433829703683" class="uri">https://mobile.twitter.com/jburnmurdoch/status/1256711433829703683</a>
