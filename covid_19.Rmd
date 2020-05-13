@@ -1,7 +1,8 @@
 ---
 title: "COVID-19 Tracker Indonesia"
 author: "Dio Ariadi | www.datawizart.com"
-date: "5/11/2020"
+contributor: "Contributor: Nur Izzahudin & Hamidah Alatas"
+date: "berdasarkan data 5/12/2020"
 output:
   rmarkdown::html_document:
     theme: simplex
@@ -49,7 +50,8 @@ library(plotly)
 library(gghighlight)
 library(RcppRoll)
 library(cowplot)
-
+library(ggtext)
+source("global_function.R")
 ```
 
 ```{r load data indonesia, include=FALSE}
@@ -60,6 +62,7 @@ indo_grid <- read.csv("~/indo_grid.csv",sep =  "\t",stringsAsFactors = FALSE)
 
 ```{r mempersiapkan dataset, include=FALSE}
 heatmap_indo <- df_indo %>%
+  arrange(data_date) %>% 
   group_by(province) %>%
   mutate(casesroll_avg=roll_mean(daily_case, 7, align="right", fill=0)) %>% 
   mutate(maxcaserate=max(casesroll_avg), 
@@ -88,16 +91,16 @@ heatmap_daily_indo <- heatmap_indo %>% ungroup() %>%
 
 ### Bagaimana kondisi wilayah provinsi kalian? Apakah telah melewati puncak dari penambahan kasus?
 
-Untuk menjawab ini kami menggunakan rolling avg kasus positif 7 hari kebelakang. Hal ini mereplikasi apa yang dilakukan oleh dashboard pada Financial Times [link](https://ig.ft.com/coronavirus-chart/?areas=usa&areas=idn&cumulative=0&logScale=1&perMillion=0&values=cases). Terdapat dua chart yang kami buat, pertama adalah untuk mempermudah membandingkan tiap provinsi. Kedua adalah untuk melihat bagaimana provinsi itu sendiri.
-
-Selain itu Heatmap didapat dari twitter @VictimOfMaths [source](https://github.com/VictimOfMaths/COVID-19). Untuk dapat melihat secara lebih untuk membandingkan tiap provinsi
-
+Untuk menjawab pertanyaan ini kami membuat tiga grafik yang masing-masing dapat digunakan untuk menganalisis kasus Covid-19 di 34 provinsi di Indonesia. 
+Ketiga grafik ini menampilkan rolling average 7-hari dari jumlah kasus positif Covid-19 di setiap provinsi. Grafik pertama dan kedua merupakan replikasi dari dashboard yang dibuat oleh **Financial Times** [link](https://ig.ft.com/coronavirus-chart/?areas=usa&areas=idn&cumulative=0&logScale=1&perMillion=0&values=cases). Sedangkan grafik ketiga adalah replikasi heatmap dari akun **twitter @VictimOfMaths** [source](https://github.com/VictimOfMaths/COVID-19).
 Ketiga grafik ini melengkapi satu sama lain, terdapat keunggulan dan kelemahan dalam tiap grafik. Dengan menampilkan ketiganya diharapkan dapat diambil analisa atau kesimpulan yang mencukupi.
+
+**Disclaimer** bahwa penulis hanya membuat grafik dan tidak mengambil suatu kesimpulan.
 
 #### Time-series Rolling Average Kasus Positif Baru
 
 NOTE:
-Dalam grafik ini kami telah menyaring provinsi dimana dalam 7 hari rolling average kasus positif telah melampui 4. Diurutkan berdasarkan provinsi dengan kasus tertinggi.
+Pada grafik pertama ini, kami memetakan rolling-average dari satu provinsi dalam satu garis time-series sehingga lebih mudah melakukan perbandingan antar-provinsi. Dalam grafik ini, rolling average dimulai ketika jumlah kasus sudah mencapai 4 atau lebih kasus.
 
 ```{r rolling avg kasus positif,fig.align='center'}
 heatmap_daily_indo %>% group_by(province) %>% 
@@ -111,7 +114,7 @@ heatmap_daily_indo %>% group_by(province) %>%
                      breaks=c(1,10,100,500,1000,5000,10000,25000,80000,120000))+
   facet_wrap(~province)+
   labs(subtitle = "7 hari rolling average kasus positif, dari hari terjadinya kasus positif diatas 4",
-       y = "Rolling Avg Kasus Positif",
+       y = "Log Rolling Avg Kasus Positif",
        x = "Jumlah hari dari terjadinya kasus positif diatas 4",
        caption = "Kode oleh Dio Ariadi | www.datawizart.com\nInspirasi grafik twitter @jburnmurdoch")+
   theme(panel.background = element_rect(fill = "#f5f5f5"),
@@ -127,17 +130,20 @@ heatmap_daily_indo %>% group_by(province) %>%
 
 #### Time-series Kasus Positif Harian dan Rolling Average 7 Hari
 
-Pada grafik ini bar-chart adalah kasus positif harian dan line-chart adalah rolling avg 7 hari. Diurutkan berdasarkan kasus positif terbesar. Y-axis adalah urutan dari hari pertama terjadinya kasus positif di pronvisi tersebut.
+Pada grafik kedua, kita dapat melihat lebih detail pertambahan kasus di tiap provinsi. Selain menggunakan line chart yang menggambarkan rolling average, grafik ini menggunakan bar chart yang mengilustrasikan jumlah kasus positif per hari di provinsi tersebut. Kita dapat melihat dengan jelas pada hari keberapa peak terjadi di suatu provinsi.
 
 ```{r Time-series Kasus Positif Harian dan Rolling Average 7 Hari,fig.align='center',fig.height=8,fig.width=10}
 heatmap_indo %>% filter(total_case>0 & province!="no_define") %>% 
+  arrange(data_date) %>% 
   group_by(province) %>% 
   mutate(seq_=row_number()) %>% 
   ungroup() %>% 
   ggplot(aes(x=seq_))+
   geom_col(aes(y = daily_case),alpha=0.5)+
   geom_line(aes(y = casesroll_avg))+
-  labs(x = "Hari dari sejak terjadinya kasus positif",
+  labs(title = "Penambahan jumlah positif harian dan rolling average 7 hari",
+       subtile = "Bar adalah penambahan harian, line adalah rolling avg",
+       x = "Hari dari sejak terjadinya kasus positif",
        y = "Penambahan kasus positif",
        caption = "Kode oleh Dio Ariadi | www.datawizart.com")+
   facet_wrap(~province,scales = "free")+
@@ -153,7 +159,7 @@ heatmap_indo %>% filter(total_case>0 & province!="no_define") %>%
 
 #### Heatmap per Provinsi
 
-Heatmap ini menjelaskan 7 hari rolling average dari kasus positif baru, di lakukan normalisasi berdasarkan nilai kasus positif terbesar di tiap provinsi. Semakin hijau semakin jauh dari nilai maksimal yang terjadi pada suatu provinsi. Atau dapat diinterpretasikan telah melalui peak dari jumlah pertambahan kasus harian tertinggi.
+Heatmap ini menggambarkan 7 hari rolling average dari kasus positif baru yang dinormalisasi berdasarkan nilai kasus positif terbesar di tiap provinsi. Semakin hijau map suatu provinsi berarti semakin jauh rolling average bergerak dari jumlah kasus positif tertinggi. Hal ini dapat diinterpretasikan bahwa provinsi tersebut telah melewati puncak pertambahan kasus baru.
 
 ```{r heatmap kasus positif,fig.align='center', fig.height=10, fig.width=12, message=FALSE, warning=FALSE, dpi=60}
 heatmap_indo_2 <- heatmap_indo %>% filter(province!="no_define")
@@ -166,8 +172,10 @@ casetiles <- ggplot(heatmap_indo_2, aes(x=data_date, y=(province), fill=maxcasep
   theme_classic()+
   scale_fill_distiller(palette="Spectral")+
   scale_y_discrete(name="", expand=c(0,0))+
-  labs(
-       subtitle="Kode oleh @VictimOfMaths | Replikasi & modifkasi oleh @dioariadi | www.datawizart.com")+
+  
+  labs(title = "Heatmap penambahan kasus positif harian",
+       subtitle = "Warna tiap hari dibandingkan dengan hari penambahan kasus tertinggi",
+       caption="Kode oleh @VictimOfMaths | Replikasi & modifkasi oleh @dioariadi | www.datawizart.com")+
   theme(
     axis.line.y=element_blank(), 
     plot.subtitle=element_text(size=rel(0.78)), 
@@ -195,9 +203,66 @@ casebar <- ggplot(subset(heatmap_indo_2, data_date==max(data_date)), aes(x=total
 plot_grid(casetiles, casebar, align="h", rel_widths=c(1,0.2))
 ```
 
-### Rasio Kematian Per Provinsi
+### Perkembangan Kasus Positif
 
-Rasio kematian adalah jumlah kasus meninggal dibagi jumlah kasus positif
+Pada grafik keempat, kami menampilkan grafik log kumulatif jumlah kasus dari hari jumlah kasus lebih dari 4. Terdapat garis bantu untuk melihat bagaimana laju pertambahan kasus positif suatu kota. Bila garis hitam mengikuti arah dari salah satu garis bantu artinya kasus akan meningkat dua kali lipat dalam jangka waktu garis tersebut. 
+
+```{r pergerakan kasus positif,fig.align='center',fig.height=8,fig.width=10}
+label_case=
+  bind_rows(data.frame(value = seq_fun(start_value = 5, end_value = max(df_indo$total_case), 3), double_each = 3) %>% mutate(seq_ = row_number()-1),
+            data.frame(value = seq_fun(start_value = 5, end_value = max(df_indo$total_case), 2), double_each = 2) %>% mutate(seq_ = row_number()-1),
+            data.frame(value = seq_fun(start_value = 5, end_value = max(df_indo$total_case), 7), double_each = 7) %>% mutate(seq_ = row_number()-1),
+            data.frame(value = seq_fun(start_value = 5, end_value = max(df_indo$total_case), 4), double_each = 4) %>% mutate(seq_ = row_number()-1),
+            data.frame(value = seq_fun(start_value = 5, end_value = max(df_indo$total_case), 14), double_each = 14) %>% mutate(seq_ = row_number()-1))
+
+label_case <- label_case %>% pivot_wider(names_from = double_each,values_from = value)
+
+case_cumulative <- heatmap_indo %>% filter( total_case>4 & province!="no_defined") %>% 
+  group_by(province) %>% 
+  arrange(data_date) %>% 
+  mutate(seq_ = row_number())  %>% 
+  ungroup() %>% 
+  group_by(province,total_case) %>% 
+  mutate(seq_1 = row_number()) %>% ungroup()
+case_cumulative <- case_cumulative %>% left_join(label_case,by = c("seq_"))
+case_cumulative <- case_cumulative %>% 
+  group_by(province) %>% 
+  mutate(`3` = ifelse(`3`>max(total_case),NA,`3`),
+         `2` = ifelse(`2`>max(total_case),NA,`2`),
+         `7` = ifelse(`7`>max(total_case),NA,`7`),
+         `4` = ifelse(`4`>max(total_case),NA,`4`),
+         `14` = ifelse(`14`>max(total_case),NA,`14`))
+case_cumulative %>% 
+  ggplot()+
+  geom_line(aes(x=seq_,y=total_case) )+
+  geom_line(aes(x = seq_,y = `3`) ,linetype="dashed",color="grey")+
+  geom_line(aes(x = seq_,y = `14`),linetype="dashed",color="blue")+
+  geom_line(aes(x = seq_,y = `4`) ,linetype="dashed",color="red")+
+  geom_line(aes(x = seq_,y = `7`) ,linetype="dashed",color="darkred")+
+  scale_y_continuous(trans='log2',
+                     breaks=c(10,100,500,1000,2000,5000,10000,25000,80000,120000))+
+  facet_wrap(~province,scales = "free")+
+  labs(y = "Log Total Kasus Posititf", x = "Hari dari kasus positif berjumlah 5",
+       caption = "Kode oleh Dio Ariadi & Nur Izzahudin | www.datawizart.com",
+       title = "Kumulatif kasus positif, dari hari kasus ke 5",
+       subtitle = "<span style='color:grey'>Dashed Line (Kasus Double, setiap 3 hari)</span> <span style='color:red'>Dashed Line (. . .4 hari)</span> <span style='color:darkred'>Dashed Line (. . . 7 hari)</span> <span style='color:blue'>Dashed Line (. . .14 hari)</span>")+
+  theme(panel.background = element_rect(fill = "#f5f5f5"),
+        text = element_text(family = "Proxima Nova"),
+        panel.grid.major = element_line(colour = "#f0f0f0"),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        strip.background = element_rect(fill = "#f5f5f5"),
+        plot.background = element_rect(fill = "#f5f5f5"),
+        strip.text.x = element_text(hjust = 0),
+        plot.subtitle = element_markdown(size = 8))
+  
+```
+
+
+### Tingkat Kematian Per Provinsi
+
+Tingkat kematian didefinisikan sebagai jumlah kasus meninggal dibagi jumlah kasus positif. Dapat kita lihat bahwa provinsi-provinsi dengan tingkat kematian tertinggi banyak terdapat di pulau Jawa dan Sumatera.
+
 
 ```{r ratio kematian per provinsi, fig.align='center', fig.height=7, fig.retina=1.2, fig.width=12, message=FALSE, warning=FALSE}
 death_ratio_df <- df_indo %>% 
@@ -247,11 +312,11 @@ death_ratio_df %>% filter(province!="no_define") %>%
   geom_hline(aes(yintercept= overall_indo),linetype ="dashed",color = "darkred")+
   geom_hline(aes(yintercept= overall_world),linetype ="dashed",color = "darkblue")+
   #geom_text(aes(x = 4, y = 0.082, label = paste("Rasio Kematian\n Indonesia:",round(overall_indo,3)*100)), family= "Proxima Nova",size =3)+
-  annotate("text", x = 4, y = 0.075, label = paste("Rasio Kematian\nIndonesia:",round(overall_indo,3)*100,"%"),family = "Proxima Nova",
+  annotate("text", x = 4, y = overall_indo+0.002, label = paste("Rasio Kematian\nIndonesia:",round(overall_indo,3)*100,"%"),family = "Proxima Nova",
            size=3,
            colour ="darkred",
            hjust = 0)+
-    annotate("text", x = 8, y = 0.068, label = paste("Rasio Kematian\nDunia:",round(overall_world,3)*100,"%"),family = "Proxima Nova",
+    annotate("text", x = 8, y = overall_world-0.002, label = paste("Rasio Kematian\nDunia:",round(overall_world,3)*100,"%"),family = "Proxima Nova",
            size=3,
            colour ="darkblue",
            hjust = 1)+
@@ -274,12 +339,23 @@ death_ratio_df %>% filter(province!="no_define") %>%
   #geom_text(aes(label=name_short),vjust =-1,family = "Proxima Nova",size = 3)
 ```
 
+### Apakah dapat dibuat kesimpulan dari gambar di atas?
+
+Untuk pengambilan kesimpulan kembali ke pembaca masing-masing. Sebagai referensi [Kematian Jakarta naik 52% dibandingkan rata-rata tahun sebelumnya](https://twitter.com/jburnmurdoch/status/1260233704141619205?s=20)
+
 ### Kritik dan Saran
 
 - email `dioariadi11@gmail.com`
 
 
 ### Appendix
+
+#### Contributor
+
+- [Dio Ariadi](https://www.linkedin.com/in/dioariadi/)
+- [Nur Izzahudin](https://www.linkedin.com/in/nur-izzahudin/)
+- [Hamidah Alatas](https://www.linkedin.com/in/hamidah-alatas-4a5675126/)
+
 
 #### Tanggal PSBB 
 
@@ -304,4 +380,5 @@ Internasional:
 - https://ig.ft.com/coronavirus-chart/?areas=usa&areas=idn&cumulative=1&logScale=1&perMillion=0&values=cases
 - https://github.com/VictimOfMaths/COVID-19/blob/master/LAHeatmaps.R
 - https://mobile.twitter.com/jburnmurdoch/status/1256711433829703683
+
 
