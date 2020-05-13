@@ -1,5 +1,5 @@
 Hasil dibawah juga dapat dilihat pada situs 
-https://datawizart.com/covid-19-tracker.html
+https://www.datawizart.com/covid-19-tracker-indonesia.html
 
 Yang diperlukan untuk mereplikasi hasil dibawah:
 covid_19.Rmd
