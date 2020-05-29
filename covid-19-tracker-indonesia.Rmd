@@ -1,6 +1,6 @@
 ---
 title: "COVID-19 Tracker Indonesia"
-author: "[www.datawizart.com](https://datawizart.com/)"
+author: "[www.datawizart.com](https://datawizart.com/)" 
 date: "based on data: 5/29/2020"
 output:
   rmarkdown::html_document:
