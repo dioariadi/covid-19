@@ -105,6 +105,7 @@ df_worldmeter_analysis <- df_worldmeter %>%
   mutate_if(is.factor,as.character) %>% 
   mutate(data_date = as.POSIXct(strptime(data_date,format = "%b %d")),
          value = as.numeric(value)) %>% 
+  filter(metric %in% c("cases","daily_cases","deaths","daily_deaths","new_cases")) %>% 
   pivot_wider(names_from = metric,values_from = value) %>% 
   mutate(load_date = Sys.Date())
 
