@@ -6,6 +6,7 @@
 ## v0.1
 ## will take around 4-8 minutes depend(?)
 library(rvest)
+library(tidyverse)
 url_link <- "https://www.worldometers.info/coronavirus/#countries"
 list_of_country <- read_html(url_link) %>% html_nodes(".mt_a") %>% html_text()
 link_to_the_country <- read_html(url_link) %>% html_nodes(".mt_a") %>% html_attr("href") %>% unique()
