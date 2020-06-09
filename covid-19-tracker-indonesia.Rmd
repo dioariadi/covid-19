@@ -1,7 +1,7 @@
 ---
 title: "COVID-19 Tracker Indonesia"
 author: "[www.datawizart.com](https://datawizart.com/)" 
-date: "based on data: 6/8/2020"
+date: "based on data: 6/9/2020"
 output:
   rmarkdown::html_document:
     theme: simplex
@@ -61,7 +61,7 @@ indo_grid <- read.csv("~/indo_grid.csv",sep =  "\t",stringsAsFactors = FALSE)
 ```
 
 ```{r mempersiapkan dataset, include=FALSE}
-date_variable <- "2020-06-08"
+date_variable <- "2020-06-09"
 
 heatmap_indo <- df_indo %>%
   arrange(data_date) %>% 
@@ -112,7 +112,7 @@ heatmap_daily_indo %>% group_by(province) %>%
   geom_point(aes(y = dott_y),size=1)+
   gghighlight(use_direct_label = FALSE,unhighlighted_params = list(size=0.4))+
   scale_y_continuous(trans='log2',
-                     breaks=c(1,10,100,500,1000,5000,10000,25000,80000,120000))+
+                     breaks=c(1,10,100,200,1000,5000,10000,25000,80000,120000))+
   facet_wrap(~province)+
   labs(subtitle = "7 days rolling average positif cases, since # of positive cases above 4",
        y = "Log Rolling Avg Positif Case",
@@ -195,7 +195,7 @@ casebar <- ggplot(subset(heatmap_indo_2, data_date==max(data_date)), aes(x=total
   geom_col(show.legend=FALSE)+
   theme_classic()+
   scale_fill_distiller(palette="Spectral")+
-  scale_x_continuous(name="Cummulative Positive Cases", breaks=c(0,1000,2000,3000,5000))+
+  scale_x_continuous(name="Cummulative Positive Cases", breaks=c(0,1000,5000,8000))+
   theme(axis.title.y=element_blank(), 
         axis.line.y=element_blank(), 
         axis.text.y=element_blank(),
