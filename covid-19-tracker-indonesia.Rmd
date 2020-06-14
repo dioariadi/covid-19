@@ -1,7 +1,7 @@
 ---
 title: "COVID-19 Tracker Indonesia"
 author: "[www.datawizart.com](https://datawizart.com/)" 
-date: "based on data: 6/9/2020"
+date: "based on data: 6/14/2020"
 output:
   rmarkdown::html_document:
     theme: simplex
@@ -61,7 +61,7 @@ indo_grid <- read.csv("~/indo_grid.csv",sep =  "\t",stringsAsFactors = FALSE)
 ```
 
 ```{r mempersiapkan dataset, include=FALSE}
-date_variable <- "2020-06-09"
+date_variable <- "2020-06-14"
 
 heatmap_indo <- df_indo %>%
   arrange(data_date) %>% 
@@ -148,7 +148,7 @@ heatmap_indo %>% filter(total_case>0 & province!="no_define") %>%
        x = "Days from the first positive case",
        y = "# Positive Case",
        caption = paste("Code by Dio Ariadi | www.datawizart.com\nData Source: kawalCOVID19 | covid19.go.id",date_variable))+
-  facet_wrap(~province,scales = "free")+
+  facet_wrap(~province,scales = "free",ncol = 5)+
   theme(panel.background = element_rect(fill = "#f5f5f5"),
         text = element_text(family = "Proxima Nova"),
         panel.grid.major = element_line(colour = "#f0f0f0"),
