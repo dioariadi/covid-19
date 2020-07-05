@@ -13,6 +13,7 @@ link_to_the_country <- read_html(url_link) %>% html_nodes(".mt_a") %>% html_attr
 all_html <-read_html(url_link) %>%
   html_nodes("tr") 
 
+print("Get all nodes")
 # html_nodes("#main_table_countries_today") %>% html_node(".even") 
 temp <- list()
 temp2 <- list()
@@ -93,11 +94,15 @@ tidying_data <- function(result_from_getworldmeters){
 }
 
 retrieve_data_worldmeter <- function(url_){
+  pb$tick()$print()
   tidying_data(get_worldmeters(country = url_)) 
 }
 
 time1 <- Sys.time()
 
+print("retrieve from website")
+
+pb <- progress_estimated(nrow(country_dataset))
 df_worldmeter <- country_dataset %>% 
   mutate(get_data = map(url, retrieve_data_worldmeter))
 
