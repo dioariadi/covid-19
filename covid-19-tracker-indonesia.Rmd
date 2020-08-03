@@ -1,7 +1,7 @@
 ---
 title: "COVID-19 Tracker Indonesia"
 author: "[www.datawizart.com](https://datawizart.com/)" 
-date: "based on data: 31/07/2020"
+date: "based on data: 03/08/2020"
 output:
   rmarkdown::html_document:
     theme: simplex
@@ -61,7 +61,7 @@ indo_grid <- read.csv("~/indo_grid.csv",sep =  "\t",stringsAsFactors = FALSE)
 ```
 
 ```{r mempersiapkan dataset, include=FALSE}
-date_variable <- "2020-07-31"
+date_variable <- "2020-08-03"
 
 heatmap_indo <- df_indo %>%
   arrange(data_date) %>% 
